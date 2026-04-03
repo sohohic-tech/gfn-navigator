@@ -84,7 +84,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const isNewVideo = !prev.completedVideoIds.includes(videoId);
       const newCompletedDates = isAlreadyDoneToday ? prev.completedDates : [...prev.completedDates, today];
       const newCompletedVideoIds = isNewVideo ? [...prev.completedVideoIds, videoId] : prev.completedVideoIds;
-      const newTotalStamps = isAlreadyDoneToday ? prev.totalStamps : prev.totalStamps + 1;
+      const newTotalStamps = prev.totalStamps + 1;
       let newStreak = prev.streak;
       if (!isAlreadyDoneToday) {
         const yesterday = new Date();
