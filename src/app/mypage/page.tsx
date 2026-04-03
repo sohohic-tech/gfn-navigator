@@ -101,7 +101,7 @@ export default function MyPage() {
   if (isLoading) return <div className="min-h-screen bg-black flex items-center justify-center font-black text-primary">LOADING...</div>;
 
   return (
-    <main className="min-h-screen bg-black text-white pb-40 max-w-7xl mx-auto border-x border-white/5 shadow-2xl overflow-x-hidden">
+    <main className="min-h-screen bg-black text-white pb-40 w-full max-w-7xl mx-auto border-x border-white/5 shadow-2xl overflow-x-hidden">
       <header className="px-6 pt-12 pb-8 bg-gradient-to-b from-primary/10 to-transparent">
         <button onClick={() => setLanguage(lang === 'ja' ? 'en' : 'ja')} className="float-right text-[10px] bg-white/10 px-3 py-1 rounded-full text-primary font-black uppercase">{c.langB}</button>
         <div className="flex items-center gap-4 mb-8">
@@ -306,7 +306,7 @@ export default function MyPage() {
       </footer>
 
       {/* Nav */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-8 md:px-12 py-5 rounded-full flex gap-8 md:gap-12 border border-white/10 shadow-3xl z-50 whitespace-nowrap">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-8 md:px-12 py-5 rounded-full flex gap-8 md:gap-12 border border-white/10 shadow-3xl z-50 whitespace-nowrap max-w-[90vw] overflow-x-auto no-scrollbar scale-90 sm:scale-100">
         <Link href="/" className="text-gray-500 text-[10px] font-black">ホーム</Link>
         <Link href="/mypage" className="text-primary text-[10px] font-black">{c.nav[1]}</Link>
       </div>
