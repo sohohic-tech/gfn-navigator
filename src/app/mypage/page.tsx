@@ -24,6 +24,27 @@ export default function MyPage() {
   const [historyVideos, setHistoryVideos] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateVideos, setSelectedDateVideos] = useState<any[]>([]);
+  const [dynamicRecs, setDynamicRecs] = useState<any[]>([]);
+
+  // Load dynamic recommendations based on subscriptions
+  useEffect(() => {
+    const loadRecs = async () => {
+      let q = "fitness trainer top";
+      if (userData.favoriteTrainers.length > 0) {
+        const last = userData.favoriteTrainers[userData.favoriteTrainers.length - 1].name;
+        q = `${last} related trainer`;
+      }
+      try {
+        const res = await fetch(`/api/youtube?type=search&q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        setDynamicRecs(data.items?.slice(0, 5) || []);
+      } catch (e) {
+        console.error(e);
+        setDynamicRecs(RECOMMENDED_CHANNELS);
+      }
+    };
+    if (!isLoading) loadRecs();
+  }, [userData.favoriteTrainers, isLoading]);
 
   // Load history video details if in history mode
   useEffect(() => {
@@ -225,26 +246,33 @@ export default function MyPage() {
               </div>
             </div>
 
-            {/* Recommended Trainers */}
+            {/* Recommended Trainers (DYNAMIC) */}
             <div className="space-y-4 pt-12">
-               <h2 className="text-[10px] font-black uppercase tracking-widest text-primary italic border-l-2 border-primary pl-3">おすすめの配信者 (発見)</h2>
+               <h2 className="text-[10px] font-black uppercase tracking-widest text-primary italic border-l-2 border-primary pl-3">
+                 {userData.favoriteTrainers.length > 0 ? "あなたに似たおすすめ" : "注目の配信者 (発見)"}
+               </h2>
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {RECOMMENDED_CHANNELS.map(chan => {
-                    const isSubscribed = userData.favoriteTrainers.some(t => t.id === chan.id);
+                  {(dynamicRecs.length > 0 ? dynamicRecs : RECOMMENDED_CHANNELS).map(chan => {
+                    const id = chan.id?.channelId || chan.id;
+                    const name = chan.snippet?.title || chan.name;
+                    const image = chan.snippet?.thumbnails?.high?.url || chan.image;
+                    const tag = chan.snippet?.description || chan.tag;
+                    const isSubscribed = userData.favoriteTrainers.some(t => t.id === id);
+                    
                     return (
-                      <div key={chan.id} className="bg-white/5 border border-white/10 rounded-[32px] p-5 flex items-center justify-between hover:border-primary/20 transition-all">
-                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-zinc-800 border border-white/10 overflow-hidden">
-                               <img src={chan.image || "https://api.dicebear.com/7.x/identicon/svg?seed=fitness"} className="w-full h-full object-cover" alt="p" />
+                      <div key={id} className="bg-white/5 border border-white/10 rounded-[32px] p-5 flex items-center justify-between hover:border-primary/20 transition-all">
+                         <div className="flex items-center gap-4 min-w-0">
+                            <div className="w-12 h-12 rounded-full bg-zinc-800 border border-white/10 overflow-hidden shrink-0">
+                               <img src={image || "https://api.dicebear.com/7.x/identicon/svg?seed=fitness"} className="w-full h-full object-cover" alt="p" />
                             </div>
-                            <div>
-                               <h3 className="text-xs font-bold text-white">{chan.name}</h3>
-                               <p className="text-[9px] text-gray-500 font-black uppercase tracking-tighter mt-0.5">{chan.tag}</p>
+                            <div className="min-w-0">
+                               <h3 className="text-xs font-bold text-white truncate">{name}</h3>
+                               <p className="text-[9px] text-gray-500 font-black uppercase tracking-tighter mt-0.5 truncate">{tag}</p>
                             </div>
                          </div>
                          <button 
-                           onClick={() => toggleFavoriteTrainer(chan.id, chan.name)}
-                           className={`text-[9px] font-black uppercase px-4 py-2 rounded-full transition-all ${isSubscribed ? 'bg-zinc-800 text-gray-500' : 'bg-primary/20 text-primary border border-primary/30 hover:bg-primary hover:text-black'}`}
+                           onClick={() => toggleFavoriteTrainer(id, name)}
+                           className={`text-[9px] font-black uppercase px-4 py-2 rounded-full transition-all shrink-0 ml-2 ${isSubscribed ? 'bg-zinc-800 text-gray-500' : 'bg-primary/20 text-primary border border-primary/30 hover:bg-primary hover:text-black'}`}
                          >
                             {isSubscribed ? '解除' : '追加'}
                          </button>
