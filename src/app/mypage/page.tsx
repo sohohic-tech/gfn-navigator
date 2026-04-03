@@ -75,7 +75,7 @@ export default function MyPage() {
              type="text"
              value={userData.userName}
              onChange={(e) => updateUserName(e.target.value)}
-             className="bg-transparent text-xl font-black italic uppercase tracking-tighter border-b border-white/10 focus:border-primary outline-none"
+             className="flex-1 min-w-0 bg-transparent text-xl font-black italic uppercase tracking-tighter border-b border-white/10 focus:border-primary outline-none"
            />
         </div>
         <div className="grid grid-cols-2 gap-4">
