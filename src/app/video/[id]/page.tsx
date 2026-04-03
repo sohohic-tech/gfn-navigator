@@ -227,6 +227,10 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
         )}
       </div>
 
+      <footer className="mt-20 py-10 border-t border-white/5 text-center px-6">
+        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">© {new Date().getFullYear()} なぎさのお星サマ制作委員会</p>
+      </footer>
+
       {/* Persistent Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-6 glass border-t border-white/10 z-[60]">
         {!isVideoCompleted ? (

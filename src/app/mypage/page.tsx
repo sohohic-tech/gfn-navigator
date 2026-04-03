@@ -20,7 +20,7 @@ export default function MyPage() {
       searchH: "配信者の名前を入力 (のがちゃんねる等)", searchB: "検索",
       confirmTitle: "この配信者ですか？ (本人確認)",
       previewTitle: "最新のトレーニング (プレビュー)",
-      sub: "購読中", unsub: "+ 購読して自動要約を有効化",
+      sub: "購読中 (解除する)", unsub: "+ 購読リストに追加 (無料)",
       langB: "English", nav: ["ホーム", "マイページ"]
     },
     en: {
@@ -28,7 +28,7 @@ export default function MyPage() {
       searchH: "Enter trainer name", searchB: "Search",
       confirmTitle: "Is this the correct trainer?",
       previewTitle: "Latest Workouts (Preview)",
-      sub: "Subscribed", unsub: "+ Subscribe & Unlock AI Guide",
+      sub: "Subscribed (Unsubscribe)", unsub: "+ Add to Subscriptions (FREE)",
       langB: "Japanese", nav: ["Home", "My Page"]
     }
   }[lang];
@@ -64,7 +64,7 @@ export default function MyPage() {
   if (isLoading) return <div className="min-h-screen bg-black flex items-center justify-center font-black text-primary">LOADING...</div>;
 
   return (
-    <main className="min-h-screen bg-black text-white pb-40 max-w-7xl mx-auto border-x border-white/5 shadow-2xl">
+    <main className="min-h-screen bg-black text-white pb-40 max-w-7xl mx-auto border-x border-white/5 shadow-2xl overflow-x-hidden">
       <header className="px-6 pt-12 pb-8 bg-gradient-to-b from-primary/10 to-transparent">
         <button onClick={() => setLanguage(lang === 'ja' ? 'en' : 'ja')} className="float-right text-[10px] bg-white/10 px-3 py-1 rounded-full text-primary font-black uppercase">{c.langB}</button>
         <div className="flex items-center gap-4 mb-8">
@@ -169,8 +169,12 @@ export default function MyPage() {
         </div>
       </section>
 
+      <footer className="mt-20 py-10 border-t border-white/5 text-center px-6">
+        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">© {new Date().getFullYear()} なぎさのお星サマ制作委員会</p>
+      </footer>
+
       {/* Nav */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-12 py-5 rounded-full flex gap-12 border border-white/10 shadow-3xl z-50">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-8 md:px-12 py-5 rounded-full flex gap-8 md:gap-12 border border-white/10 shadow-3xl z-50 whitespace-nowrap">
         <Link href="/" className="text-gray-500 text-[10px] font-black">ホーム</Link>
         <Link href="/mypage" className="text-primary text-[10px] font-black">{c.nav[1]}</Link>
       </div>

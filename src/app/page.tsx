@@ -39,7 +39,7 @@ export default function Home() {
 
   const content = {
     ja: {
-        hero: "世界のトップ知恵、独占。",
+        hero: "世界と繋がる、あなただけのフィットネス",
         tagline: "購読中のトレーナーによる最新トレーニングを分析しました。",
         section: "あなたへの特別メニュー",
         unlockBtn: "🔒 広告を見て 15本以上の過去動画を全解放 (FREE)",
@@ -60,7 +60,7 @@ export default function Home() {
   const displayVideos = userData.isFullLibraryUnlocked ? allVideos : allVideos.slice(0, 5);
 
   return (
-    <main className="min-h-screen pb-40 bg-black text-white max-w-7xl mx-auto border-x border-white/5 shadow-2xl">
+    <main className="min-h-screen pb-40 bg-black text-white max-w-7xl mx-auto border-x border-white/5 shadow-2xl overflow-x-hidden">
       <nav className="sticky top-0 z-50 glass px-6 py-4 flex justify-between items-center shadow-2xl border-b border-white/5">
         <h1 className="text-xl font-black italic tracking-tighter uppercase">GFN<span className="text-primary italic">.</span></h1>
         <Link href="/mypage" className="bg-white/10 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">マイページ</Link>
@@ -117,8 +117,12 @@ export default function Home() {
           </>
         )}
       </section>
+      
+      <footer className="mt-20 py-10 border-t border-white/5 text-center px-6">
+        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">© {new Date().getFullYear()} なぎさのお星サマ制作委員会</p>
+      </footer>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 glass px-12 py-5 rounded-full flex gap-12 border border-white/10 shadow-3xl z-50">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 glass px-8 md:px-12 py-5 rounded-full flex gap-8 md:gap-12 border border-white/10 shadow-3xl z-50 whitespace-nowrap">
         <Link href="/" className="text-primary text-[10px] font-black border-b border-primary">ホーム</Link>
         <Link href="/mypage" className="text-gray-500 text-[10px] font-black">マイページ</Link>
       </div>
