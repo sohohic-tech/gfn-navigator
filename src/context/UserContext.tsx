@@ -19,6 +19,7 @@ interface UserData {
   language: Language;
   isFullLibraryUnlocked: boolean; // Flag for Ad Reward
   userName: string;
+  dailyRecord?: Record<string, string[]>;
 }
 
 interface UserContextType {
@@ -28,6 +29,7 @@ interface UserContextType {
   unlockFullLibrary: () => void;
   setLanguage: (lang: Language) => void;
   updateUserName: (name: string) => void;
+  undoTraining: (videoId: string, dateStr?: string) => void;
   isLoading: boolean;
 }
 
@@ -45,6 +47,7 @@ const DEFAULT_DATA: UserData = {
   language: 'ja',
   isFullLibraryUnlocked: false,
   userName: 'GUEST',
+  dailyRecord: {},
 };
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -100,6 +103,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         totalStamps: newTotalStamps,
         streak: newStreak,
         lastTrainingDate: new Date().toISOString(),
+        dailyRecord: {
+          ...(prev.dailyRecord || {}),
+          [today]: [...(prev.dailyRecord?.[today] || []), videoId].filter((v, i, a) => a.indexOf(v) === i)
+        }
       };
     });
   };
@@ -128,8 +135,32 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setUserData(prev => ({ ...prev, userName: name }));
   };
 
+  const undoTraining = (videoId: string, dateStr?: string) => {
+    const today = dateStr || new Date().toISOString().split('T')[0];
+    setUserData(prev => {
+      const newVideoIds = prev.completedVideoIds.filter(id => id !== videoId);
+      const newDailyRecord = { ...prev.dailyRecord || {} };
+      if (newDailyRecord[today]) {
+        newDailyRecord[today] = newDailyRecord[today].filter(id => id !== videoId);
+        if (newDailyRecord[today].length === 0) delete newDailyRecord[today];
+      }
+      // If no videos left for that date, remove date from list
+      const newCompletedDates = (newDailyRecord[today]?.length || 0) > 0 
+        ? prev.completedDates 
+        : prev.completedDates.filter(d => d !== today);
+
+      return {
+        ...prev,
+        completedVideoIds: newVideoIds,
+        dailyRecord: newDailyRecord,
+        completedDates: newCompletedDates,
+        totalStamps: Math.max(0, prev.totalStamps - 1),
+      };
+    });
+  };
+
   return (
-    <UserContext.Provider value={{ userData, completeTraining, toggleFavoriteTrainer, unlockFullLibrary, setLanguage, updateUserName, isLoading }}>
+    <UserContext.Provider value={{ userData, completeTraining, toggleFavoriteTrainer, unlockFullLibrary, setLanguage, updateUserName, undoTraining, isLoading }}>
       {children}
     </UserContext.Provider>
   );

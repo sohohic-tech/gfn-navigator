@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, use } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FitnessVideo } from '@/types/fitness';
 import AffiliateSection from '@/components/video/AffiliateSection';
 import { useUser } from '@/context/UserContext';
@@ -44,6 +45,7 @@ const VIDEO_DATABASE: Record<string, FitnessVideo> = {
 
 export default function VideoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   
   // If id is in database, use it. Otherwise, assume it's a direct YouTube ID.
   const video = VIDEO_DATABASE[id] || {
@@ -68,7 +70,7 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { userData, completeTraining } = useUser();
+  const { userData, completeTraining, undoTraining } = useUser();
   const isVideoCompleted = userData.completedVideoIds.includes(video.id);
 
   useEffect(() => {
@@ -107,6 +109,7 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
       if (playerRef.current) playerRef.current.destroy();
     };
   }, [video.youtubeId]);
+
 
   const seekTo = (seconds: number) => {
     if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
@@ -238,8 +241,19 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
             トレーニングを完了する
           </button>
         ) : (
-          <div className="w-full py-5 bg-white/10 text-primary rounded-full font-black text-center border border-primary animate-bounce shadow-[0_0_20px_rgba(192,255,1,0.2)] flex items-center justify-center gap-2">
-            <span>🔥</span> お疲れ様でした！スタンプを記録しました
+          <div className="space-y-4">
+            <button 
+              onClick={() => router.push('/')} 
+              className="w-full py-5 bg-white/10 text-primary rounded-full font-black text-center border border-primary animate-bounce shadow-[0_0_20px_rgba(192,255,1,0.2)] flex items-center justify-center gap-2 hover:bg-primary/20 transition-all"
+            >
+              <span>🔥</span> お疲れ様でした！スタンプを記録しました (ホームへ戻る)
+            </button>
+            <button 
+              onClick={() => undoTraining(video.id)} 
+              className="w-full text-[10px] text-gray-500 font-black uppercase tracking-widest text-center hover:text-red-400 transition-colors"
+            >
+              ✕ 間違えて押した (スタンプを取り消す)
+            </button>
           </div>
         )}
       </div>

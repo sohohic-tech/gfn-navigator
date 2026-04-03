@@ -6,9 +6,10 @@ const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const type = searchParams.get('type'); // 'search' or 'videos'
+  const type = searchParams.get('type'); // 'search' or 'videos' or 'detail'
   const q = searchParams.get('q');       // query string
   const channelId = searchParams.get('channelId');
+  const ids = searchParams.get('ids');   // comma-separated video ids
 
   // fallback results for development (if no API Key provided)
   if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "YOUR_ACTUAL_API_KEY_HERE") {
@@ -38,6 +39,9 @@ export async function GET(request: Request) {
     } else if (type === 'videos') {
       // Get latest 50 videos from specific channel
       url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&maxResults=50&type=video&key=${YOUTUBE_API_KEY}`;
+    } else if (type === 'detail') {
+      // Get specifics for a list of video IDs
+      url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${ids}&key=${YOUTUBE_API_KEY}`;
     }
 
     const response = await fetch(url);
