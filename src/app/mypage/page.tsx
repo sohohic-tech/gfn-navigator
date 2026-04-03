@@ -5,6 +5,14 @@ import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
 import { Trainer } from '@/types/fitness';
 
+const RECOMMENDED_CHANNELS = [
+  { id: "UCO98reM6_X98Y0i_bM3mXpQ", name: "のがちゃんねる (Noga)", tag: "JP / HIIT / YOGA", image: "https://yt3.googleusercontent.com/ytc/AIdro_n8t9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T=s176-c-k-c0x00ffffff-no-rj" },
+  { id: "UCX69-7Z9P3S3GvY_qN_Y_qN_Y_qN_Y_qN", name: "Marina Takewaki", tag: "JP / Dance / Diet", image: "https://yt3.googleusercontent.com/ytc/AIdro_m8R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9R9=s176-c-k-c0x00ffffff-no-rj" },
+  { id: "UCCgLoMYIyP7i129h-3329-3329-3329", name: "Chloe Ting", tag: "Global / Abs / HIIT", image: "https://yt3.googleusercontent.com/ytc/AIdro_n8t9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T_nZ9Y9X0T=s176-c-k-c0x00ffffff-no-rj" },
+  { id: "UCV_7_V_7_V_7_V_7_V_7_V_7_V_7_V_7", name: "MadFit", tag: "Global / Strength", image: "https://api.dicebear.com/7.x/identicon/svg?seed=MadFit" },
+  { id: "UCa-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a", name: "Pamela Reif", tag: "Global / Aesthetics", image: "https://api.dicebear.com/7.x/identicon/svg?seed=Pamela" }
+];
+
 export default function MyPage() {
   const { userData, toggleFavoriteTrainer, setLanguage, updateUserName, isLoading } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
@@ -215,6 +223,35 @@ export default function MyPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Recommended Trainers */}
+            <div className="space-y-4 pt-12">
+               <h2 className="text-[10px] font-black uppercase tracking-widest text-primary italic border-l-2 border-primary pl-3">おすすめの配信者 (発見)</h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {RECOMMENDED_CHANNELS.map(chan => {
+                    const isSubscribed = userData.favoriteTrainers.some(t => t.id === chan.id);
+                    return (
+                      <div key={chan.id} className="bg-white/5 border border-white/10 rounded-[32px] p-5 flex items-center justify-between hover:border-primary/20 transition-all">
+                         <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-zinc-800 border border-white/10 overflow-hidden">
+                               <img src={chan.image || "https://api.dicebear.com/7.x/identicon/svg?seed=fitness"} className="w-full h-full object-cover" alt="p" />
+                            </div>
+                            <div>
+                               <h3 className="text-xs font-bold text-white">{chan.name}</h3>
+                               <p className="text-[9px] text-gray-500 font-black uppercase tracking-tighter mt-0.5">{chan.tag}</p>
+                            </div>
+                         </div>
+                         <button 
+                           onClick={() => toggleFavoriteTrainer(chan.id, chan.name)}
+                           className={`text-[9px] font-black uppercase px-4 py-2 rounded-full transition-all ${isSubscribed ? 'bg-zinc-800 text-gray-500' : 'bg-primary/20 text-primary border border-primary/30 hover:bg-primary hover:text-black'}`}
+                         >
+                            {isSubscribed ? '解除' : '追加'}
+                         </button>
+                      </div>
+                    );
+                  })}
+               </div>
             </div>
           </>
         )}
