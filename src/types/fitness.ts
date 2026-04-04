@@ -23,6 +23,8 @@ export interface FitnessVideo {
   navigationItems: NavigationItem[];
   aiRecommendedProducts: RecommendedProduct[];
   category: 'HIIT' | 'Yoga' | 'Stretch' | 'Strength';
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+  estimatedCalories?: number;
   tags?: string[];
   thumbnail?: string;
 }

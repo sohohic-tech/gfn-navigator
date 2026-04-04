@@ -21,7 +21,15 @@ export default function Home() {
          const data = await res.json();
          return data.items || [];
       }));
-      setAllVideos(results.flat().sort((a,b) => new Date(b.snippet.publishedAt).getTime() - new Date(a.snippet.publishedAt).getTime()));
+      
+      const flattened = results.flat();
+      // Ensure unique videos by ID
+      const uniqueVideos = Array.from(new Map(flattened.map((item: any) => {
+         const vid = typeof item.id === 'string' ? item.id : item.id.videoId;
+         return [vid, item];
+      })).values());
+
+      setAllVideos(uniqueVideos.sort((a: any, b: any) => new Date(b.snippet.publishedAt).getTime() - new Date(a.snippet.publishedAt).getTime()));
     };
 
     if (!isLoading) fetchAllSubscribedVideos();
@@ -80,9 +88,15 @@ export default function Home() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {displayVideos.map((video: any) => {
-                const isCompleted = userData.completedVideoIds.includes(video.id.videoId);
+                const videoId = typeof video.id === 'string' ? video.id : video.id.videoId;
+                const isCompleted = userData.completedVideoIds.includes(videoId);
+                
                 return (
-                  <div key={video.id.videoId} className={`group relative bg-zinc-900 border rounded-[32px] overflow-hidden shadow-2xl transition-all duration-500 ${isCompleted ? 'border-primary/40' : 'border-white/5 hover:border-primary/20'}`}>
+                  <Link 
+                    href={`/video/${videoId}`} 
+                    key={videoId} 
+                    className={`group relative bg-zinc-900 border rounded-[40px] overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer block hover:scale-[1.01] active:scale-[0.98] ${isCompleted ? 'border-primary/40' : 'border-white/5 hover:border-primary/20'}`}
+                  >
                     {isCompleted && (
                       <div className="absolute top-6 right-6 z-20 bg-primary text-black text-[10px] font-black px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(192,255,1,0.5)] flex items-center gap-1 italic uppercase animate-fade-in">
                         ✓ 完了済み
@@ -97,12 +111,14 @@ export default function Home() {
                     </div>
                     <div className="p-6 space-y-4">
                       <div className="flex items-center gap-2"><p className="text-[9px] text-primary font-black uppercase tracking-widest italic">{video.snippet.channelTitle}</p></div>
-                      <div className="bg-white/5 rounded-3xl p-6 italic text-xs text-gray-300 leading-relaxed group-hover:bg-white/10 transition-colors">「この動画のAI分析ガイドを生成しました。正しいフォームとタイマー機能が利用可能です。」</div>
-                      <Link href={`/video/${video.id.videoId}`} className={`w-full py-5 rounded-[24px] text-[10px] font-black flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl uppercase italic ${isCompleted ? 'bg-zinc-800 text-gray-400 border border-white/10' : 'bg-white text-black'}`}>
+                      <div className="bg-white/5 rounded-[28px] p-6 italic text-[11px] text-gray-400 leading-relaxed group-hover:bg-white/10 transition-colors border border-white/5">
+                        「AI分析ガイドを生成済み。正しい姿勢とタイミングをガイドします。」
+                      </div>
+                      <div className={`w-full py-5 rounded-[24px] text-[10px] font-black flex items-center justify-center gap-2 transition-all shadow-2xl uppercase italic ${isCompleted ? 'bg-zinc-800 text-gray-400 border border-white/10' : 'bg-white text-black'}`}>
                         {isCompleted ? 'もう一度トレーニングする' : 'プログラムを開始する'} <span>→</span>
-                      </Link>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -126,7 +142,10 @@ export default function Home() {
         )}
       </section>
       
-      <footer className="mt-20 py-10 border-t border-white/5 text-center px-6">
+      <footer className="mt-20 py-10 border-t border-white/5 text-center px-6 space-y-4">
+        <Link href="/about" className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-primary transition-colors">
+          About App — アプリについて
+        </Link>
         <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">© {new Date().getFullYear()} なぎさのお星サマ制作委員会</p>
       </footer>
 

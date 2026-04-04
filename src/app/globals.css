@@ -77,3 +77,40 @@ html, body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* AI Lock Blur Effect */
+.ai-blur-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-blur-content {
+  transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+.is-locked .ai-blur-content {
+  filter: blur(6px);
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s infinite ease-in-out;
+}

@@ -19,7 +19,15 @@ interface UserData {
   language: Language;
   isFullLibraryUnlocked: boolean; // Flag for Ad Reward
   userName: string;
+  aiStamina: number; // AI Request Credits
+  aiStaminaExpiresAt: string | null; // Date (YYYY-MM-DD)
   dailyRecord?: Record<string, string[]>;
+  fitnessProfile?: {
+    goals: string[];
+    focusAreas: string[];
+    frequency: string;
+    duration: string;
+  };
 }
 
 interface UserContextType {
@@ -27,15 +35,18 @@ interface UserContextType {
   completeTraining: (videoId: string) => void;
   toggleFavoriteTrainer: (trainerId: string, trainerName?: string) => void;
   unlockFullLibrary: () => void;
+  consumeAiStamina: () => void;
+  rechargeAiStamina: () => void;
   setLanguage: (lang: Language) => void;
   updateUserName: (name: string) => void;
+  updateFitnessProfile: (profile: any) => void;
   undoTraining: (videoId: string, dateStr?: string) => void;
   isLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'gfn_user_data_v4';
+const STORAGE_KEY = 'gfn_user_data_v5';
 
 const DEFAULT_DATA: UserData = {
   completedVideoIds: [],
@@ -47,6 +58,8 @@ const DEFAULT_DATA: UserData = {
   language: 'ja',
   isFullLibraryUnlocked: false,
   userName: 'GUEST',
+  aiStamina: 3,
+  aiStaminaExpiresAt: null, // Set on first load
   dailyRecord: {},
 };
 
@@ -56,6 +69,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
+    const today = new Date().toISOString().split('T')[0];
+    
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -63,10 +78,30 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (parsed.favoriteTrainers && parsed.favoriteTrainers.length > 0 && typeof parsed.favoriteTrainers[0] === 'string') {
           parsed.favoriteTrainers = parsed.favoriteTrainers.map((id: string) => ({ id, name: id }));
         }
+
+        // Migration: Set initial expiry if newly added
+        if (parsed.aiStaminaExpiresAt === undefined) {
+           const d = new Date();
+           d.setDate(d.getDate() + 7);
+           parsed.aiStaminaExpiresAt = d.toISOString().split('T')[0];
+        }
+
+        // Check Expiry
+        if (parsed.aiStamina > 0 && parsed.aiStaminaExpiresAt && today > parsed.aiStaminaExpiresAt) {
+           console.log("AI Stamina expired.");
+           parsed.aiStamina = 0;
+        }
+
         setUserData(parsed);
       } catch (e) {
         console.error("Failed to parse user data", e);
       }
+    } else {
+       // First Time Setup Expiry
+       const d = new Date();
+       d.setDate(d.getDate() + 7);
+       const initialExpiry = d.toISOString().split('T')[0];
+       setUserData(prev => ({ ...prev, aiStaminaExpiresAt: initialExpiry }));
     }
     setIsLoading(false);
   }, []);
@@ -159,8 +194,32 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateFitnessProfile = (profile: any) => {
+    setUserData(prev => ({ ...prev, fitnessProfile: profile }));
+  };
+
+  const consumeAiStamina = () => {
+    setUserData(prev => ({ ...prev, aiStamina: Math.max(0, prev.aiStamina - 1) }));
+  };
+
+  const rechargeAiStamina = () => {
+    setUserData(prev => ({ ...prev, aiStamina: 3 }));
+  };
+
   return (
-    <UserContext.Provider value={{ userData, completeTraining, toggleFavoriteTrainer, unlockFullLibrary, setLanguage, updateUserName, undoTraining, isLoading }}>
+    <UserContext.Provider value={{ 
+      userData, 
+      completeTraining, 
+      toggleFavoriteTrainer, 
+      unlockFullLibrary, 
+      consumeAiStamina,
+      rechargeAiStamina,
+      setLanguage, 
+      updateUserName, 
+      updateFitnessProfile,
+      undoTraining, 
+      isLoading 
+    }}>
       {children}
     </UserContext.Provider>
   );
